@@ -15,19 +15,26 @@ export default function ItemPage() {
   const [activeBtn, setActiveBtn] = useState<string | null>(null);
 
   async function load() {
-    const { data, error } = await supabase
-      .from("items")
-      .select("*")
-      .eq("id", id)
-      .single();
+  const { data, error } = await supabase
+    .from("items")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle(); // ✅ no "Cannot coerce..." errors
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    setItem(data);
+  if (error) {
+    console.error(error);
+    setItem({ __error: error.message });
+    return;
   }
+
+  if (!data) {
+    setItem({ __error: "Item not found (wrong link/QR, or it was deleted)." });
+    return;
+  }
+
+  setItem(data);
+}
+
 
   function hapticSuccess() {
     // Works on most phones; safe no-op on unsupported devices
@@ -71,6 +78,16 @@ export default function ItemPage() {
   }, [id]);
 
   if (!item) return <div style={{ padding: 20 }}>Loading…</div>;
+
+if (item.__error) {
+  return (
+    <div style={{ padding: 20 }}>
+      <h2>Problem</h2>
+      <p>{item.__error}</p>
+      <button onClick={() => router.push("/items")}>Back to items</button>
+    </div>
+  );
+}
 
   const low = item.stock_on_hand <= item.reorder_level;
 
