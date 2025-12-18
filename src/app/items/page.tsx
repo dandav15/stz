@@ -6,6 +6,7 @@ import { supabaseBrowser } from "@/lib/supabaseBrowser";
 
 export default function ItemsPage() {
   const supabase = supabaseBrowser();
+
   const [items, setItems] = useState<any[]>([]);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
@@ -15,20 +16,27 @@ export default function ItemsPage() {
       setLoading(true);
       setErr("");
 
-      const { data: userData } = await supabase.auth.getUser();
+      // 1) Are we signed in?
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr) {
+        setErr(`auth.getUser(): ${userErr.message}`);
+        setLoading(false);
+        return;
+      }
       if (!userData?.user) {
-        setErr("Not signed in. Go to /login and sign in.");
+        setErr("Not signed in on this device/domain. Go to /login and sign in again.");
         setLoading(false);
         return;
       }
 
+      // 2) Can we SELECT items?
       const { data, error } = await supabase
         .from("items")
-        .select("*")
+        .select("id,name,stock_on_hand,active")
         .eq("active", true)
         .order("name");
 
-      if (error) setErr(error.message);
+      if (error) setErr(`items select: ${error.message}`);
       setItems(data || []);
       setLoading(false);
     })();
@@ -39,10 +47,10 @@ export default function ItemsPage() {
       <h1>Items</h1>
 
       {loading && <p>Loading…</p>}
-      {err && <p style={{ color: "crimson", fontWeight: 700 }}>{err}</p>}
+      {err && <p style={{ color: "crimson", fontWeight: 800 }}>{err}</p>}
 
       {!loading && !err && items.length === 0 && (
-        <p style={{ opacity: 0.8 }}>No items returned.</p>
+        <p style={{ opacity: 0.85 }}>No items returned (but request succeeded).</p>
       )}
 
       {items.map((i) => (
@@ -56,4 +64,3 @@ export default function ItemsPage() {
     </main>
   );
 }
-
