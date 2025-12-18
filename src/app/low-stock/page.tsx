@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseBrowser } from "@/lib/supabaseBrowser";
+
 
 export default function LowStockPage() {
   const [items, setItems] = useState<any[]>([]);
+  const supabase = supabaseBrowser();
+
 
   useEffect(() => {
     supabase.from("items").select("*").then(({ data }) => {

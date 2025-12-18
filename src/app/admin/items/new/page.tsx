@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseBrowser } from "@/lib/supabaseBrowser";
+
 
 export default function NewItemPage() {
   const [name, setName] = useState("");
   const [stock, setStock] = useState(0);
+  const supabase = supabaseBrowser();
+
 
   async function create() {
     const { data } = await supabase
