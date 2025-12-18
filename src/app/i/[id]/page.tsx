@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseBrowser } from "@/lib/supabaseBrowser";
+
 
 export default function ItemPage() {
   const params = useParams();
   const id = params?.id as string;
 
   const router = useRouter();
+  const supabase = supabaseBrowser();
+
 
   const [item, setItem] = useState<any>(null);
   const [pulse, setPulse] = useState(false);
