@@ -41,7 +41,6 @@ export default function ItemsPage() {
       <h1>Items</h1>
 
       {loading && <p>Loading…</p>}
-      {err && <p style={{ color: "crimson", fontWeight: 800 }}>{err}</p>}
 
       {!loading && !err && items.length === 0 && (
         <p style={{ opacity: 0.85 }}>No items found.</p>
@@ -50,7 +49,7 @@ export default function ItemsPage() {
       {items.map((i) => {
         const href = `/i/${i.id}`;
         return (
-          <Link key={i.id} href={href}>
+          <Link key={i.id} href={`/i/${encodeURIComponent(i.id)}`}>
             <div
               style={{
                 border: "1px solid #334155",
@@ -61,7 +60,6 @@ export default function ItemsPage() {
             >
               <b>{i.name}</b>
               <div style={{ opacity: 0.9 }}>Stock: {i.stock_on_hand}</div>
-              <div style={{ opacity: 0.6, fontSize: 12 }}>ID: {i.id}</div>
             </div>
           </Link>
         );
