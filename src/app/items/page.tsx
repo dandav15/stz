@@ -16,27 +16,21 @@ export default function ItemsPage() {
       setLoading(true);
       setErr("");
 
-      // 1) Are we signed in?
-      const { data: userData, error: userErr } = await supabase.auth.getUser();
-      if (userErr) {
-        setErr(`auth.getUser(): ${userErr.message}`);
-        setLoading(false);
-        return;
-      }
+      const { data: userData } = await supabase.auth.getUser();
       if (!userData?.user) {
-        setErr("Not signed in on this device/domain. Go to /login and sign in again.");
+        setErr("Not signed in. Go to /login and sign in.");
         setLoading(false);
         return;
       }
 
-      // 2) Can we SELECT items?
+      // ✅ Explicitly fetch id (and only the fields we need)
       const { data, error } = await supabase
         .from("items")
         .select("id,name,stock_on_hand,active")
         .eq("active", true)
         .order("name");
 
-      if (error) setErr(`items select: ${error.message}`);
+      if (error) setErr(error.message);
       setItems(data || []);
       setLoading(false);
     })();
@@ -50,17 +44,28 @@ export default function ItemsPage() {
       {err && <p style={{ color: "crimson", fontWeight: 800 }}>{err}</p>}
 
       {!loading && !err && items.length === 0 && (
-        <p style={{ opacity: 0.85 }}>No items returned (but request succeeded).</p>
+        <p style={{ opacity: 0.85 }}>No items found.</p>
       )}
 
-      {items.map((i) => (
-        <Link key={i.id} href={`/i/${i.id}`}>
-          <div style={{ border: "1px solid #334155", padding: 12, marginTop: 10, borderRadius: 14 }}>
-            <b>{i.name}</b>
-            <div>Stock: {i.stock_on_hand}</div>
-          </div>
-        </Link>
-      ))}
+      {items.map((i) => {
+        const href = `/i/${i.id}`;
+        return (
+          <Link key={i.id} href={href}>
+            <div
+              style={{
+                border: "1px solid #334155",
+                padding: 12,
+                marginTop: 10,
+                borderRadius: 14
+              }}
+            >
+              <b>{i.name}</b>
+              <div style={{ opacity: 0.9 }}>Stock: {i.stock_on_hand}</div>
+              <div style={{ opacity: 0.6, fontSize: 12 }}>ID: {i.id}</div>
+            </div>
+          </Link>
+        );
+      })}
     </main>
   );
 }
