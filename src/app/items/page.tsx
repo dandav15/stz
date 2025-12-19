@@ -60,7 +60,7 @@ export default function ItemsPage() {
             >
               <b>{i.name}</b>
               <div style={{ opacity: 0.9 }}>Stock: {i.stock_on_hand}</div>
-              <div style={{ opacity: 0.6, fontSize: 12 }}>ID: {i.id}</div>
+              
             </div>
           </Link>
         );
