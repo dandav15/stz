@@ -88,87 +88,99 @@ export default function LoginClient() {
   };
 
   return (
-    <main style={{ padding: 20, maxWidth: 520 }}>
-      <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>STZ</h1>
-      <p style={{ opacity: 0.8, marginTop: 6 }}>Sign in to manage stock.</p>
+    <main className="page">
+      <div className="pageContent">
+        <p className="frostCard">
+          Sign in to manage stock.
+        </p>
 
-      <form className="frostCard" onSubmit={signIn} style={{ marginTop: 14 }}>
-        <div style={{ display: "grid", gap: 10 }}>
-          <label style={{ fontSize: 13, opacity: 0.8, fontWeight: 700 }}>
-            Email
-          </label>
-          <input
-            placeholder="you@email.com"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            style={inputStyle}
-          />
+        <form className="frostCard" onSubmit={signIn}>
 
-          <label style={{ fontSize: 13, opacity: 0.8, fontWeight: 700, marginTop: 6 }}>
-            Password
-          </label>
-          <input
-            placeholder="Your password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            style={inputStyle}
-          />
-
-          <label style={{ display: "flex", gap: 10, alignItems: "center", opacity: 0.85, marginTop: 4 }}>
+          <div style={{ display: "grid", gap: 10 }}>
+            <label style={{ fontSize: 13, opacity: 0.8, fontWeight: 700 }}>
+              Email
+            </label>
             <input
-              type="checkbox"
-              checked={remember}
-              onChange={(e) => setRemember(e.target.checked)}
+              placeholder="you@email.com"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              style={inputStyle}
             />
-            Remember me
-          </label>
 
-          {err && <div style={{ color: "#f87171", fontWeight: 900 }}>{err}</div>}
-          {msg && <div style={{ color: "#4ade80", fontWeight: 900 }}>{msg}</div>}
+            <label style={{ fontSize: 13, opacity: 0.8, fontWeight: 700, marginTop: 6 }}>
+              Password
+            </label>
+            <input
+              placeholder="Your password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              style={inputStyle}
+            />
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              marginTop: 6,
-              padding: 16,
-              fontSize: 18,
-              borderRadius: 16,
-              color: "#ffffff",
-              fontWeight: 900,
-              border: "2px solid #14532d",
-              background: loading ? "#0f3d22" : "#16a34a",
-              width: "100%",
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-          >
-            {loading ? "Signing in…" : "Sign in"}
-          </button>
+            <label
+              style={{
+                display: "flex",
+                gap: 10,
+                alignItems: "center",
+                opacity: 0.85,
+                marginTop: 4,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
+              Remember me
+            </label>
 
-          <button
-            type="button"
-            onClick={signUp}
-            disabled={loading}
-            style={{
-              padding: 14,
-              fontSize: 16,
-              borderRadius: 16,
-              color: "#e6e6e6",
-              border: "2px dashed #6b7280",
-              background: "rgba(255,255,255,0.04)",
-              fontWeight: 800,
-              width: "100%",
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-          >
-            Create account
-          </button>
-        </div>
-      </form>
+            {err && <div style={{ color: "#f87171", fontWeight: 900 }}>{err}</div>}
+            {msg && <div style={{ color: "#4ade80", fontWeight: 900 }}>{msg}</div>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                marginTop: 6,
+                padding: 16,
+                fontSize: 18,
+                borderRadius: 16,
+                color: "#ffffff",
+                fontWeight: 900,
+                border: "2px solid #14532d",
+                background: loading ? "#0f3d22" : "#16a34a",
+                width: "100%",
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
+            >
+              {loading ? "Signing in…" : "Sign in"}
+            </button>
+
+            <button
+              type="button"
+              onClick={signUp}
+              disabled={loading}
+              style={{
+                padding: 14,
+                fontSize: 16,
+                borderRadius: 16,
+                color: "#e6e6e6",
+                border: "2px dashed #6b7280",
+                background: "rgba(255,255,255,0.04)",
+                fontWeight: 800,
+                width: "100%",
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
+            >
+              Create account
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
   );
 }

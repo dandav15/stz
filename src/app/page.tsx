@@ -3,7 +3,6 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <main style={{ padding: 20, maxWidth: 520 }}>
-      <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>STZ</h1>
       <p style={{ opacity: 0.8, marginTop: 6 }}>
         Stock tracking
       </p>

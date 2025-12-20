@@ -49,6 +49,7 @@ a {
   background: var(--card);
   backdrop-filter: blur(6px);
   box-shadow: var(--shadow);
+  width: 100%;
 }
 
 /* Animation you used */
@@ -65,4 +66,23 @@ a {
     text-shadow: 0 0 6px rgba(220, 38, 38, 0.6),
       0 0 14px rgba(220, 38, 38, 0.5);
   }
+}
+/* Page container – used on ALL pages */
+.page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Content inside page (cards, lists) */
+.pageContent {
+  width: 100%;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }

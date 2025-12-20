@@ -5,8 +5,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <main style={{ padding: 20, maxWidth: 520 }}>
-          <div className="frostCard">
+        <main className="page">
+          <div className="PageContent">
             Loading…
           </div>
         </main>
