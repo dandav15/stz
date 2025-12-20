@@ -1,33 +1,28 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --bg: #0b1220;
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.75);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --border: #334155;
+  --card: rgba(255, 255, 255, 0.06);
+  --card2: rgba(255, 255, 255, 0.04);
+
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  --radius-lg: 22px;
+  --radius-md: 14px;
 }
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+  height: 100%;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
 a {
@@ -35,8 +30,39 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+/* Shared “card link” look (matches your /i/[id] vibe) */
+.cardLink {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: block;
+  background: var(--card2);
+  font-weight: 700;
+}
+
+/* Frosted card */
+.frostCard {
+  margin-top: 10px;
+  margin-bottom: 12px;
+  padding: 14px 22px;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
+}
+
+/* Animation you used */
+@keyframes breatheRed {
+  0% {
+    text-shadow: 0 0 6px rgba(220, 38, 38, 0.6),
+      0 0 14px rgba(220, 38, 38, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(220, 38, 38, 0.95),
+      0 0 22px rgba(220, 38, 38, 0.85);
+  }
+  100% {
+    text-shadow: 0 0 6px rgba(220, 38, 38, 0.6),
+      0 0 14px rgba(220, 38, 38, 0.5);
   }
 }

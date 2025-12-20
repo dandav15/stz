@@ -12,6 +12,7 @@ export default function LoginClient() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
   function clearOldSupabaseSession() {
     for (const key of Object.keys(localStorage)) {
@@ -31,20 +32,24 @@ export default function LoginClient() {
 
     setErr("");
     setMsg("");
+    setLoading(true);
 
-    if (!remember) clearOldSupabaseSession();
+    try {
+      if (!remember) clearOldSupabaseSession();
 
-    const supabase = supabaseBrowser(remember);
+      const supabase = supabaseBrowser(remember);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setErr(error.message);
+        return;
+      }
 
-    if (error) {
-      setErr(error.message);
-      return;
+      const next = searchParams.get("next") || "/";
+      window.location.href = next;
+    } finally {
+      setLoading(false);
     }
-
-    const next = searchParams.get("next") || "/";
-    window.location.href = next;
   }
 
   async function signUp() {
@@ -55,59 +60,114 @@ export default function LoginClient() {
 
     setErr("");
     setMsg("");
+    setLoading(true);
 
-    const supabase = supabaseBrowser(remember);
+    try {
+      const supabase = supabaseBrowser(remember);
+      const { error } = await supabase.auth.signUp({ email, password });
 
-    const { error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        setErr(error.message);
+        return;
+      }
 
-    if (error) {
-      setErr(error.message);
-      return;
+      setMsg("Account created. If email confirmation is enabled, check your inbox.");
+    } finally {
+      setLoading(false);
     }
-
-    setMsg("Account created. If email confirmation is enabled, check your inbox.");
   }
 
+  const inputStyle: React.CSSProperties = {
+    border: "1px solid #334155",
+    borderRadius: 14,
+    padding: "12px 12px",
+    background: "rgba(255,255,255,0.04)",
+    color: "#fff",
+    outline: "none",
+    width: "100%",
+  };
+
   return (
-    <main style={{ padding: 20, maxWidth: 420 }}>
-      <h1 style={{ fontSize: 28, fontWeight: 700 }}>STZ</h1>
-      <p style={{ opacity: 0.7 }}>Sign in to manage stock.</p>
+    <main style={{ padding: 20, maxWidth: 520 }}>
+      <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>STZ</h1>
+      <p style={{ opacity: 0.8, marginTop: 6 }}>Sign in to manage stock.</p>
 
-      <form onSubmit={signIn} style={{ display: "grid", gap: 10, marginTop: 16 }}>
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-        />
-
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-        />
-
-        <label style={{ display: "flex", alignItems: "center", gap: 8, opacity: 0.85 }}>
+      <form className="frostCard" onSubmit={signIn} style={{ marginTop: 14 }}>
+        <div style={{ display: "grid", gap: 10 }}>
+          <label style={{ fontSize: 13, opacity: 0.8, fontWeight: 700 }}>
+            Email
+          </label>
           <input
-            type="checkbox"
-            checked={remember}
-            onChange={(e) => setRemember(e.target.checked)}
+            placeholder="you@email.com"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            style={inputStyle}
           />
-          Remember me
-        </label>
 
-        <div style={{ display: "flex", gap: 10 }}>
-          <button type="submit">Sign in</button>
-          <button type="button" onClick={signUp}>
+          <label style={{ fontSize: 13, opacity: 0.8, fontWeight: 700, marginTop: 6 }}>
+            Password
+          </label>
+          <input
+            placeholder="Your password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            style={inputStyle}
+          />
+
+          <label style={{ display: "flex", gap: 10, alignItems: "center", opacity: 0.85, marginTop: 4 }}>
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+            />
+            Remember me
+          </label>
+
+          {err && <div style={{ color: "#f87171", fontWeight: 900 }}>{err}</div>}
+          {msg && <div style={{ color: "#4ade80", fontWeight: 900 }}>{msg}</div>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              marginTop: 6,
+              padding: 16,
+              fontSize: 18,
+              borderRadius: 16,
+              color: "#ffffff",
+              fontWeight: 900,
+              border: "2px solid #14532d",
+              background: loading ? "#0f3d22" : "#16a34a",
+              width: "100%",
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? "Signing in…" : "Sign in"}
+          </button>
+
+          <button
+            type="button"
+            onClick={signUp}
+            disabled={loading}
+            style={{
+              padding: 14,
+              fontSize: 16,
+              borderRadius: 16,
+              color: "#e6e6e6",
+              border: "2px dashed #6b7280",
+              background: "rgba(255,255,255,0.04)",
+              fontWeight: 800,
+              width: "100%",
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
             Create account
           </button>
         </div>
-
-        {err && <div style={{ color: "crimson" }}>{err}</div>}
-        {msg && <div style={{ color: "green" }}>{msg}</div>}
       </form>
     </main>
   );

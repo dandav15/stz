@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
 
-
 export default function ItemPage() {
   const params = useParams();
   const id = params?.id as string;
@@ -12,35 +11,31 @@ export default function ItemPage() {
   const router = useRouter();
   const supabase = supabaseBrowser();
 
-
   const [item, setItem] = useState<any>(null);
   const [pulse, setPulse] = useState(false);
   const [activeBtn, setActiveBtn] = useState<string | null>(null);
 
   async function load() {
-  const { data, error } = await supabase
-    .from("items")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle(); // ✅ no "Cannot coerce..." errors
+    const { data, error } = await supabase
+      .from("items")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (error) {
-    console.error(error);
-    setItem({ __error: error.message });
-    return;
+    if (error) {
+      setItem({ __error: error.message });
+      return;
+    }
+
+    if (!data) {
+      setItem({ __error: "Item not found (wrong link/QR, or it was deleted)." });
+      return;
+    }
+
+    setItem(data);
   }
-
-  if (!data) {
-    setItem({ __error: "Item not found (wrong link/QR, or it was deleted)." });
-    return;
-  }
-
-  setItem(data);
-}
-
 
   function hapticSuccess() {
-    // Works on most phones; safe no-op on unsupported devices
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate([25, 40, 25]);
     }
@@ -48,7 +43,7 @@ export default function ItemPage() {
 
   function triggerPulse() {
     setPulse(true);
-    window.setTimeout(() => setPulse(false), 220);
+    setTimeout(() => setPulse(false), 220);
   }
 
   async function move(delta: number, btnKey: string) {
@@ -58,11 +53,10 @@ export default function ItemPage() {
       p_item_id: id,
       p_delta: delta,
       p_reason: delta > 0 ? "receive" : "issue",
-      p_note: null
+      p_note: null,
     });
 
-    // Button glow off (whether success or error)
-    window.setTimeout(() => setActiveBtn(null), 160);
+    setTimeout(() => setActiveBtn(null), 160);
 
     if (error) {
       alert(error.message);
@@ -70,7 +64,6 @@ export default function ItemPage() {
     }
 
     hapticSuccess();
-
     triggerPulse();
     await load();
   }
@@ -80,17 +73,35 @@ export default function ItemPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (!item) return <div style={{ padding: 20 }}>Loading…</div>;
+  if (!item) {
+    return <main style={{ padding: 20, maxWidth: 520 }}>Loading…</main>;
+  }
 
-if (item.__error) {
-  return (
-    <div style={{ padding: 20 }}>
-      <h2>Problem</h2>
-      <p>{item.__error}</p>
-      <button onClick={() => router.push("/items")}>Back to items</button>
-    </div>
-  );
-}
+  if (item.__error) {
+    return (
+      <main style={{ padding: 20, maxWidth: 520 }}>
+        <div className="frostCard">
+          <h2 style={{ marginTop: 0 }}>Problem</h2>
+          <p style={{ opacity: 0.85 }}>{item.__error}</p>
+          <button
+            onClick={() => router.push("/items")}
+            style={{
+              marginTop: 12,
+              padding: 12,
+              borderRadius: 14,
+              border: "1px solid #334155",
+              background: "rgba(255,255,255,0.04)",
+              color: "#fff",
+              fontWeight: 800,
+              width: "100%",
+            }}
+          >
+            Back to items
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   const low = item.stock_on_hand <= item.reorder_level;
 
@@ -102,7 +113,7 @@ if (item.__error) {
     ...base,
     boxShadow: activeBtn === key ? glow : "none",
     transform: activeBtn === key ? "scale(0.99)" : "scale(1)",
-    transition: "box-shadow 120ms ease, transform 120ms ease"
+    transition: "box-shadow 120ms ease, transform 120ms ease",
   });
 
   const baseBig = {
@@ -113,7 +124,7 @@ if (item.__error) {
     fontWeight: 850,
     borderWidth: 2,
     borderStyle: "solid",
-    width: "100%"
+    width: "100%",
   } as const;
 
   const baseSmall = {
@@ -124,60 +135,48 @@ if (item.__error) {
     fontWeight: 850,
     borderWidth: 2,
     borderStyle: "solid",
-    width: "100%"
+    width: "100%",
   } as const;
 
   return (
     <main style={{ padding: 20, maxWidth: 520 }}>
       <h1 style={{ fontSize: 24, fontWeight: 900, textAlign: "center" }}>
-  {item.name}
-</h1>
+        {item.name}
+      </h1>
 
+      {/* Stock display */}
+      <div
+        className="frostCard"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontSize: 15, opacity: 0.75 }}>In stock</div>
 
-     <div
-  style={{
-    marginTop: 10,
-    marginBottom: 12,
-    padding: "14px 22px",
-    borderRadius: 22,
-    background: "rgba(255,255,255,0.06)",
-    backdropFilter: "blur(6px)",
-    boxShadow: "0 8px 28px rgba(0,0,0,0.35)",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    textAlign: "center"
-  }}
->
-  <div style={{ fontSize: 15, opacity: 0.75 }}>In stock</div>
+        <div
+          style={{
+            fontSize: 46,
+            fontWeight: 950,
+            lineHeight: 1.05,
+            textShadow: stockGlow,
+            transform: pulse ? "scale(1.06)" : "scale(1)",
+            transition: "transform 180ms ease",
+            animation: low ? "breatheRed 2.6s ease-in-out infinite" : "none",
+          }}
+        >
+          {item.stock_on_hand}
+        </div>
+      </div>
 
-  <div
-  style={{
-    fontSize: 46,
-    fontWeight: 950,
-    color: "#ffffff",
-    lineHeight: 1.05,
-    textShadow: stockGlow,
-    transform: pulse ? "scale(1.06)" : "scale(1)",
-    transition: "transform 180ms ease",
-    animation: low ? "breatheRed 2.6s ease-in-out infinite" : "none"
-  }}
->
-  {item.stock_on_hand}
-</div>
-
-</div>
-
-
+      {/* Controls */}
       <div style={{ display: "grid", gap: 12, marginTop: 18 }}>
         <button
           onClick={() => move(-1, "issue1")}
           style={btnStyle(
-            {
-              ...baseBig,
-              background: "#dc2626",
-              borderColor: "#7f1d1d"
-            },
+            { ...baseBig, background: "#dc2626", borderColor: "#7f1d1d" },
             "issue1",
             "0 0 0 4px rgba(255,255,255,0.25), 0 0 18px rgba(220,38,38,0.85)"
           )}
@@ -188,11 +187,7 @@ if (item.__error) {
         <button
           onClick={() => move(+1, "recv1")}
           style={btnStyle(
-            {
-              ...baseBig,
-              background: "#16a34a",
-              borderColor: "#14532d"
-            },
+            { ...baseBig, background: "#16a34a", borderColor: "#14532d" },
             "recv1",
             "0 0 0 4px rgba(255,255,255,0.25), 0 0 18px rgba(22,163,74,0.85)"
           )}
@@ -204,11 +199,7 @@ if (item.__error) {
           <button
             onClick={() => move(-5, "issue5")}
             style={btnStyle(
-              {
-                ...baseSmall,
-                background: "#b91c1c",
-                borderColor: "#7f1d1d"
-              },
+              { ...baseSmall, background: "#b91c1c", borderColor: "#7f1d1d" },
               "issue5",
               "0 0 0 4px rgba(255,255,255,0.2), 0 0 16px rgba(220,38,38,0.8)"
             )}
@@ -219,11 +210,7 @@ if (item.__error) {
           <button
             onClick={() => move(+5, "recv5")}
             style={btnStyle(
-              {
-                ...baseSmall,
-                background: "#15803d",
-                borderColor: "#14532d"
-              },
+              { ...baseSmall, background: "#15803d", borderColor: "#14532d" },
               "recv5",
               "0 0 0 4px rgba(255,255,255,0.2), 0 0 16px rgba(22,163,74,0.8)"
             )}
@@ -242,50 +229,12 @@ if (item.__error) {
             color: "#e6e6e6ff",
             border: "2px dashed #6b7280",
             background: "#555151ff",
-            fontWeight: 800
+            fontWeight: 800,
           }}
         >
           📷 Scan next item
         </button>
       </div>
-
-      {/* Optional: simple dark-ish background so the glow pops more */}
-      <style jsx global>{`
-        body {
-          background: #0b1220;
-          color: #ffffff;
-        }
-        a {
-          color: inherit;
-          text-decoration: none;
-          font-weight: 700;
-          border: 1px solid #334155;
-          padding: 12px;
-          border-radius: 14px;
-          display: block;
-          background: rgba(255, 255, 255, 0.04);
-        }
-      `}</style>
-      <style jsx>{`
-  @keyframes breatheRed {
-    0% {
-      text-shadow:
-        0 0 6px rgba(220,38,38,0.6),
-        0 0 14px rgba(220,38,38,0.5);
-    }
-    50% {
-      text-shadow:
-        0 0 10px rgba(220,38,38,0.95),
-        0 0 22px rgba(220,38,38,0.85);
-    }
-    100% {
-      text-shadow:
-        0 0 6px rgba(220,38,38,0.6),
-        0 0 14px rgba(220,38,38,0.5);
-    }
-  }
-`}</style>
-
     </main>
   );
 }

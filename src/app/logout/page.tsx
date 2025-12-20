@@ -2,16 +2,25 @@
 
 import { useEffect } from "react";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
-import { useRouter } from "next/navigation";
 
 export default function LogoutPage() {
-  const router = useRouter();
-  const supabase = supabaseBrowser();
-
-
   useEffect(() => {
-    supabase.auth.signOut().then(() => router.push("/login"));
+    const supabase = supabaseBrowser(true);
+
+    supabase.auth.signOut().finally(() => {
+      // Hard reload so cookies + middleware fully reset
+      window.location.href = "/login";
+    });
   }, []);
 
-  return <div style={{ padding: 20 }}>Signing out…</div>;
+  return (
+    <main style={{ padding: 20, maxWidth: 520 }}>
+      <div className="frostCard" style={{ textAlign: "center" }}>
+        <div style={{ fontSize: 18, fontWeight: 900 }}>Signing out…</div>
+        <div style={{ marginTop: 6, opacity: 0.75 }}>
+          See you in a sec
+        </div>
+      </div>
+    </main>
+  );
 }

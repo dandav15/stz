@@ -24,7 +24,6 @@ export default function ItemsPage() {
         return;
       }
 
-      // ✅ Explicitly fetch id (and only the fields we need)
       const { data, error } = await supabase
         .from("items")
         .select("id,name,stock_on_hand,active")
@@ -35,40 +34,59 @@ export default function ItemsPage() {
       setItems(data || []);
       setLoading(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <main style={{ padding: 20, maxWidth: 520 }}>
-      <h1>Items</h1>
-      <LogoutButton/>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>Items</h1>
+        <LogoutButton />
+      </div>
 
-      {loading && <p>Loading…</p>}
-
-      {!loading && !err && items.length === 0 && (
-        <p style={{ opacity: 0.85 }}>No items found.</p>
+      {loading && (
+        <div className="frostCard" style={{ marginTop: 14 }}>
+          <p style={{ margin: 0, opacity: 0.85 }}>Loading…</p>
+        </div>
       )}
 
-      {items.map((i) => {
-        const href = `/i/${i.id}`;
-        return (
-          <Link key={i.id} href={`/i/${encodeURIComponent(i.id)}`}>
-            <div
-              style={{
-                border: "1px solid #334155",
-                padding: 12,
-                marginTop: 10,
-                borderRadius: 14
-              }}
-            >
-              <b>{i.name}</b>
-              <div style={{ opacity: 0.9 }}>Stock: {i.stock_on_hand}</div>
-              
+      {!loading && err && (
+        <div className="frostCard" style={{ marginTop: 14 }}>
+          <p style={{ margin: 0, color: "#f87171", fontWeight: 800 }}>{err}</p>
+        </div>
+      )}
+
+      {!loading && !err && items.length === 0 && (
+        <div className="frostCard" style={{ marginTop: 14 }}>
+          <p style={{ margin: 0, opacity: 0.85 }}>No items found.</p>
+        </div>
+      )}
+
+      <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+        {items.map((i) => (
+          <Link
+            key={i.id}
+            href={`/i/${encodeURIComponent(i.id)}`}
+            className="cardLink"
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+              <div>
+                <div style={{ fontWeight: 900 }}>{i.name}</div>
+                <div style={{ opacity: 0.85 }}>Stock: {i.stock_on_hand}</div>
+              </div>
+
+              <div style={{ opacity: 0.75, fontWeight: 900 }}>→</div>
             </div>
-            
           </Link>
-          
-        );
-      })}
+        ))}
+      </div>
     </main>
   );
 }
