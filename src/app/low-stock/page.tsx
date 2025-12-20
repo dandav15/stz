@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
+import LogoutButton from "@/components/LogoutButton";
 
 
 export default function LowStockPage() {
@@ -18,6 +19,7 @@ export default function LowStockPage() {
   return (
     <main style={{ padding: 20 }}>
       <h1>Low stock</h1>
+      <LogoutButton/>
 
       {items.map(i => (
         <div key={i.id} style={{ border: "1px solid #ccc", padding: 10, marginTop: 8 }}>

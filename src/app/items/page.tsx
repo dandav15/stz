@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function ItemsPage() {
   const supabase = supabaseBrowser();
@@ -39,6 +40,7 @@ export default function ItemsPage() {
   return (
     <main style={{ padding: 20, maxWidth: 520 }}>
       <h1>Items</h1>
+      <LogoutButton/>
 
       {loading && <p>Loading…</p>}
 
@@ -62,7 +64,9 @@ export default function ItemsPage() {
               <div style={{ opacity: 0.9 }}>Stock: {i.stock_on_hand}</div>
               
             </div>
+            
           </Link>
+          
         );
       })}
     </main>

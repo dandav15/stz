@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
-
+import LogoutButton from "@/components/LogoutButton";
 
 export default function NewItemPage() {
   const [name, setName] = useState("");
@@ -33,6 +33,7 @@ export default function NewItemPage() {
   return (
     <main style={{ padding: 20 }}>
       <h1>Add item</h1>
+      <LogoutButton/>
 
       <input placeholder="Name" onChange={e => setName(e.target.value)} />
       <br /><br />
