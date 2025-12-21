@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BrowserQRCodeReader } from "@zxing/browser";
 
@@ -26,51 +26,77 @@ export default function ScanPage() {
   const [scanning, setScanning] = useState(false);
   const [err, setErr] = useState("");
 
+  // Used to ignore late results after cancel
+  const cancelledRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      // cleanup on unmount
+      stopCameraStream();
+      tryRuntimeReset();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const tryRuntimeReset = () => {
+    try {
+      // Some versions expose reset() at runtime but typings may not.
+      (readerRef.current as any)?.reset?.();
+    } catch {}
+  };
+
+  const stopCameraStream = () => {
+    try {
+      const v = videoRef.current;
+      const stream = (v?.srcObject as MediaStream | null) ?? null;
+      stream?.getTracks().forEach((t) => t.stop());
+      if (v) v.srcObject = null;
+    } catch {}
+  };
+
   const startScan = async () => {
     try {
       setErr("");
+      cancelledRef.current = false;
+
       setShowCamera(true);
       setScanning(true);
 
       if (!readerRef.current) readerRef.current = new BrowserQRCodeReader();
       if (!videoRef.current) throw new Error("Video not ready.");
 
-      // ✅ Rear camera preferred (mobile)
       const result = await readerRef.current.decodeOnceFromConstraints(
-        { video: { facingMode: { ideal: "environment" } } },
+        { video: { facingMode: { ideal: "environment" } } }, // rear camera preferred
         videoRef.current
       );
+
+      // If user cancelled while promise was pending, ignore result
+      if (cancelledRef.current) return;
 
       setScanning(false);
       setShowCamera(false);
 
       router.push(toItemRoute(result.getText()));
     } catch (e: any) {
+      if (cancelledRef.current) return; // ignore errors caused by cancel
       setScanning(false);
       setErr(e?.message || "Failed to start scanner.");
-      // keep camera visible so they can try again (or cancel)
       setShowCamera(true);
     }
   };
 
   const cancel = () => {
-    try {
-      // Some versions expose reset(), some don’t in TS.
-      // We can safely stop by clearing the video stream.
-      const v = videoRef.current;
-      const stream = v?.srcObject as MediaStream | null;
-      stream?.getTracks().forEach((t) => t.stop());
-      if (v) v.srcObject = null;
-    } catch {}
-
+    cancelledRef.current = true;
     setScanning(false);
     setShowCamera(false);
+
+    // stop the camera + try to cancel decoder
+    stopCameraStream();
+    tryRuntimeReset();
   };
 
   return (
     <main className="page">
-      <h1 className="frostCard">Scan QR</h1>
-
       {err && (
         <div className="frostCard" style={{ marginTop: 14 }}>
           <div style={{ color: "#f87171", fontWeight: 800 }}>{err}</div>
@@ -81,24 +107,31 @@ export default function ScanPage() {
       )}
 
       {!showCamera && (
-        <div className="buttonStack" style={{ marginTop: 14 }}>
+        <div className="buttonStack" style={{ marginTop: 18 }}>
           <button
             onClick={startScan}
             className="cardLink"
-            style={{ textAlign: "center", cursor: "pointer" }}
+            style={{
+              textAlign: "center",
+              cursor: "pointer",
+              padding: "22px 18px",
+              fontSize: 22,
+              fontWeight: 950,
+              borderRadius: 18,
+            }}
             disabled={scanning}
           >
-            {scanning ? "Starting…" : "📷 Scan"}
+            {scanning ? "Starting…" : "📷 Scan QR"}
           </button>
 
           <div className="frostCard" style={{ opacity: 0.85 }}>
-            Tap scan, point at the label, and it will jump straight to the item page.
+            Tap “Scan QR”, point at the label, and it will open the item page instantly.
           </div>
         </div>
       )}
 
       {showCamera && (
-        <div className="buttonStack" style={{ marginTop: 14 }}>
+        <div className="buttonStack" style={{ marginTop: 18 }}>
           <div className="frostCard">
             <video
               ref={videoRef}
@@ -112,7 +145,7 @@ export default function ScanPage() {
               }}
             />
             <div style={{ marginTop: 10, opacity: 0.85 }}>
-              {scanning ? "Scanning…" : "Camera ready — tap Scan again if needed."}
+              {scanning ? "Scanning…" : "Camera ready."}
             </div>
           </div>
 
@@ -120,10 +153,17 @@ export default function ScanPage() {
             <button
               onClick={startScan}
               className="cardLink"
-              style={{ textAlign: "center", cursor: "pointer" }}
+              style={{
+                textAlign: "center",
+                cursor: "pointer",
+                padding: "16px 14px",
+                fontSize: 18,
+                fontWeight: 950,
+                borderRadius: 16,
+              }}
               disabled={scanning}
             >
-              {scanning ? "Scanning…" : "▶ Scan"}
+              {scanning ? "Scanning…" : "▶ Scan QR"}
             </button>
 
             <button
@@ -132,10 +172,13 @@ export default function ScanPage() {
               style={{
                 textAlign: "center",
                 cursor: "pointer",
+                padding: "16px 14px",
+                fontSize: 18,
+                fontWeight: 950,
+                borderRadius: 16,
                 color: "#f87171",
                 borderColor: "#7f1d1d",
               }}
-              disabled={scanning}
             >
               ✖ Cancel
             </button>
