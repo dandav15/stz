@@ -14,13 +14,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "STZ",
-    template: "%s · STZ",
-  },
+export const metadata = {
+  title: "STZ",
   description: "Stock tracking system",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "STZ",
+  },
 };
+
 
 
 export default function RootLayout({
