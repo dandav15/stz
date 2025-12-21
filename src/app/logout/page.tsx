@@ -14,8 +14,8 @@ export default function LogoutPage() {
   }, []);
 
   return (
-    <main style={{ padding: 20, maxWidth: 520 }}>
-      <div className="frostCard" style={{ textAlign: "center" }}>
+    <main className="frostCard">
+      <div className="button">
         <div style={{ fontSize: 18, fontWeight: 900 }}>Signing out…</div>
         <div style={{ marginTop: 6, opacity: 0.75 }}>
           See you in a sec

@@ -15,9 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "STZ",
+  title: {
+    default: "STZ",
+    template: "%s · STZ",
+  },
   description: "Stock tracking system",
 };
+
 
 export default function RootLayout({
   children,
