@@ -4,8 +4,7 @@ export default function HomePage() {
   return (
     <main className = "page">
 
-      <div className="frostCard" style={{ marginTop: 14 }}>
-        <div style={{ display: "grid", gap: 10 }}>
+      <div className="buttonStack">
           <Link href="/scan" className="cardLink">
             📷 Scan QR
           </Link>
@@ -29,7 +28,6 @@ export default function HomePage() {
           >
             🚪 Logout
           </Link>
-        </div>
       </div>
     </main>
   );

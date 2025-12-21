@@ -88,3 +88,21 @@ a {
 *::after {
   box-sizing: border-box;
 }
+.appButton {
+  width: 100%;
+  padding: 14px 22px;       /* 👈 SAME as homepage */
+  margin-bottom: 12px;     /* 👈 SAME spacing */
+  border-radius: 14px;
+  border: 1px solid #334155;
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+}
+.buttonStack {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 12px; /* 👈 THIS controls spacing everywhere */
+}

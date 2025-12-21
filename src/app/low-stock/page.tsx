@@ -49,7 +49,7 @@ export default function LowStockPage() {
         </div>
       )}
 
-      <div className="frostCard">
+      <div className="buttonStack">
         {items.map((i) => (
           <Link
             key={i.id}

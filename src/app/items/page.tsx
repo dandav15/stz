@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
-import LogoutButton from "@/components/LogoutButton";
 
 export default function ItemsPage() {
   const supabase = supabaseBrowser();
@@ -19,7 +18,7 @@ export default function ItemsPage() {
 
       const { data: userData } = await supabase.auth.getUser();
       if (!userData?.user) {
-        setErr("Not signed in. Go to /login and sign in.");
+        setErr("Not signed in. Go to /signin and sign in.");
         setLoading(false);
         return;
       }
@@ -39,40 +38,30 @@ export default function ItemsPage() {
 
   return (
     <main className="page">
-      <div className="pageContent">
-        {/* Header row */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 12,
-          }}
-        >
-          <h1 className="frostCard">Items</h1>
+      <div>
+        <h1 className="frostCard">Items</h1>
+      </div>
+
+      {loading && (
+        <div className="frostCard" style={{ marginTop: 14 }}>
+          Loading…
         </div>
+      )}
 
-        {/* States */}
-        {loading && (
-          <div className="frostCard" style={{ marginTop: 14 }}>
-            <p style={{ margin: 0, opacity: 0.85 }}>Loading…</p>
-          </div>
-        )}
+      {!loading && err && (
+        <div className="frostCard" style={{ marginTop: 14 }}>
+          <p style={{ margin: 0, color: "#f87171", fontWeight: 800 }}>{err}</p>
+        </div>
+      )}
 
-        {!loading && err && (
-          <div className="frostCard" style={{ marginTop: 14 }}>
-            <p style={{ margin: 0, color: "#f87171", fontWeight: 800 }}>{err}</p>
-          </div>
-        )}
+      {!loading && !err && items.length === 0 && (
+        <div className="frostCard" style={{ marginTop: 14 }}>
+          No items found.
+        </div>
+      )}
 
-        {!loading && !err && items.length === 0 && (
-          <div className="frostCard" style={{ marginTop: 14 }}>
-            <p style={{ margin: 0, opacity: 0.85 }}>No items found.</p>
-          </div>
-        )}
-
-        {/* List */}
-        <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+      {!loading && !err && items.length > 0 && (
+        <div className="buttonStack" style={{ marginTop: 14 }}>
           {items.map((i) => (
             <Link
               key={i.id}
@@ -85,7 +74,6 @@ export default function ItemsPage() {
                   justifyContent: "space-between",
                   alignItems: "center",
                   gap: 12,
-                  width: "100%",
                 }}
               >
                 <div>
@@ -93,12 +81,12 @@ export default function ItemsPage() {
                   <div style={{ opacity: 0.85 }}>Stock: {i.stock_on_hand}</div>
                 </div>
 
-                <div style={{ opacity: 0.75, fontWeight: 900 }}>→</div>
+                <div style={{ fontWeight: 900, opacity: 0.7 }}>→</div>
               </div>
             </Link>
           ))}
         </div>
-      </div>
+      )}
     </main>
   );
 }
