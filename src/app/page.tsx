@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main style={{ padding: 20, maxWidth: 520 }}>
-      <p style={{ opacity: 0.8, marginTop: 6 }}>
+    <main className = "page">
+      <p className="frostCard">
         Stock tracking
       </p>
 

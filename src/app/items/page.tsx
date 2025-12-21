@@ -38,54 +38,67 @@ export default function ItemsPage() {
   }, []);
 
   return (
-    <main style={{ padding: 20, maxWidth: 520 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 12,
-        }}
-      >
-        <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>Items</h1>
-        <LogoutButton />
-      </div>
-
-      {loading && (
-        <div className="frostCard" style={{ marginTop: 14 }}>
-          <p style={{ margin: 0, opacity: 0.85 }}>Loading…</p>
+    <main className="page">
+      <div className="pageContent">
+        {/* Header row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
+          <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>Items</h1>
+          <LogoutButton />
         </div>
-      )}
 
-      {!loading && err && (
-        <div className="frostCard" style={{ marginTop: 14 }}>
-          <p style={{ margin: 0, color: "#f87171", fontWeight: 800 }}>{err}</p>
-        </div>
-      )}
+        {/* States */}
+        {loading && (
+          <div className="frostCard" style={{ marginTop: 14 }}>
+            <p style={{ margin: 0, opacity: 0.85 }}>Loading…</p>
+          </div>
+        )}
 
-      {!loading && !err && items.length === 0 && (
-        <div className="frostCard" style={{ marginTop: 14 }}>
-          <p style={{ margin: 0, opacity: 0.85 }}>No items found.</p>
-        </div>
-      )}
+        {!loading && err && (
+          <div className="frostCard" style={{ marginTop: 14 }}>
+            <p style={{ margin: 0, color: "#f87171", fontWeight: 800 }}>{err}</p>
+          </div>
+        )}
 
-      <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-        {items.map((i) => (
-          <Link
-            key={i.id}
-            href={`/i/${encodeURIComponent(i.id)}`}
-            className="cardLink"
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontWeight: 900 }}>{i.name}</div>
-                <div style={{ opacity: 0.85 }}>Stock: {i.stock_on_hand}</div>
+        {!loading && !err && items.length === 0 && (
+          <div className="frostCard" style={{ marginTop: 14 }}>
+            <p style={{ margin: 0, opacity: 0.85 }}>No items found.</p>
+          </div>
+        )}
+
+        {/* List */}
+        <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+          {items.map((i) => (
+            <Link
+              key={i.id}
+              href={`/i/${encodeURIComponent(i.id)}`}
+              className="cardLink"
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 12,
+                  width: "100%",
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 900 }}>{i.name}</div>
+                  <div style={{ opacity: 0.85 }}>Stock: {i.stock_on_hand}</div>
+                </div>
+
+                <div style={{ opacity: 0.75, fontWeight: 900 }}>→</div>
               </div>
-
-              <div style={{ opacity: 0.75, fontWeight: 900 }}>→</div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </main>
   );
