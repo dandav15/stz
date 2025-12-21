@@ -90,10 +90,6 @@ export default function LoginClient() {
   return (
     <main className="page">
       <div className="pageContent">
-        <p className="frostCard">
-          Sign in to manage stock.
-        </p>
-
         <form className="frostCard" onSubmit={signIn}>
 
           <div style={{ display: "grid", gap: 10 }}>

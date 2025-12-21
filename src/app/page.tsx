@@ -3,9 +3,6 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <main className = "page">
-      <p className="frostCard">
-        Stock tracking
-      </p>
 
       <div className="frostCard" style={{ marginTop: 14 }}>
         <div style={{ display: "grid", gap: 10 }}>

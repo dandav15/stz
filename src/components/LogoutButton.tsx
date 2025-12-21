@@ -3,7 +3,7 @@ import { supabaseBrowser } from "@/lib/supabaseBrowser";
 
 export default function LogoutButton() {
   return (
-    <button
+    <button className="frostCard"
       onClick={async () => {
         const supabase = supabaseBrowser(true);
         await supabase.auth.signOut();

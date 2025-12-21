@@ -3,7 +3,6 @@ export const dynamic = "force-dynamic";
 
 import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
-import LogoutButton from "@/components/LogoutButton";
 
 export default function NewItemPage() {
   const [name, setName] = useState("");
@@ -57,10 +56,9 @@ export default function NewItemPage() {
   }
 
   return (
-    <main style={{ padding: 20, maxWidth: 520 }}>
+    <main className="page">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>Add item</h1>
-        <LogoutButton />
+        <h1 className="frostCard">Add item</h1>
       </div>
 
       <div className="frostCard" style={{ marginTop: 14 }}>
@@ -120,23 +118,6 @@ export default function NewItemPage() {
             }}
           >
             {loading ? "Creating…" : "➕ Create item"}
-          </button>
-
-          <button
-            onClick={() => history.back()}
-            style={{
-              padding: 14,
-              fontSize: 16,
-              borderRadius: 16,
-              color: "#e6e6e6",
-              border: "2px dashed #6b7280",
-              background: "rgba(255,255,255,0.04)",
-              fontWeight: 800,
-              width: "100%",
-              cursor: "pointer",
-            }}
-          >
-            ← Back
           </button>
         </div>
       </div>

@@ -30,19 +30,11 @@ export default function LowStockPage() {
   }, []);
 
   return (
-    <main style={{ padding: 20, maxWidth: 520 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 12,
-        }}
-      >
-        <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>
+    <main className="page">
+      <div>
+        <h1 className="frostCard">
           Low stock
         </h1>
-        <LogoutButton />
       </div>
 
       {loading && (
@@ -57,7 +49,7 @@ export default function LowStockPage() {
         </div>
       )}
 
-      <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+      <div className="frostCard">
         {items.map((i) => (
           <Link
             key={i.id}

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
-import BackHeader from "@/components/backHeader";
 
 export default function ItemPage() {
   const params = useParams();
@@ -154,7 +153,6 @@ export default function ItemPage() {
   return (
     <main className="page">
       <div className="pageContent">
-        <BackHeader title={item.name} backTo=" /items"/>
 
         {/* Stock display */}
         <div

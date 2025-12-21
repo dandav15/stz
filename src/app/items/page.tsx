@@ -49,8 +49,7 @@ export default function ItemsPage() {
             gap: 12,
           }}
         >
-          <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>Items</h1>
-          <LogoutButton />
+          <h1 className="frostCard">Items</h1>
         </div>
 
         {/* States */}
