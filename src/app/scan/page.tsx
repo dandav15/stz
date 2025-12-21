@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BrowserQRCodeReader, BrowserCodeReader } from "@zxing/browser";
+import { BrowserQRCodeReader } from "@zxing/browser";
 
 function toItemRoute(scanned: string) {
   const raw = scanned.trim();
@@ -22,61 +22,50 @@ export default function ScanPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const readerRef = useRef<BrowserQRCodeReader | null>(null);
 
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
-  const [deviceId, setDeviceId] = useState("");
+  const [showCamera, setShowCamera] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [err, setErr] = useState("");
 
-  useEffect(() => {
-    let mounted = true;
+  const startScan = async () => {
+    try {
+      setErr("");
+      setShowCamera(true);
+      setScanning(true);
 
-    (async () => {
-      try {
-        const reader = new BrowserQRCodeReader();
-        readerRef.current = reader;
+      if (!readerRef.current) readerRef.current = new BrowserQRCodeReader();
+      if (!videoRef.current) throw new Error("Video not ready.");
 
-        const cams = await BrowserCodeReader.listVideoInputDevices();
-        if (!mounted) return;
+      // ✅ Rear camera preferred (mobile)
+      const result = await readerRef.current.decodeOnceFromConstraints(
+        { video: { facingMode: { ideal: "environment" } } },
+        videoRef.current
+      );
 
-        setDevices(cams);
+      setScanning(false);
+      setShowCamera(false);
 
-        const preferred =
-          cams.find((d) => /back|rear|environment/i.test(d.label))?.deviceId ||
-          cams[0]?.deviceId ||
-          "";
+      router.push(toItemRoute(result.getText()));
+    } catch (e: any) {
+      setScanning(false);
+      setErr(e?.message || "Failed to start scanner.");
+      // keep camera visible so they can try again (or cancel)
+      setShowCamera(true);
+    }
+  };
 
-        setDeviceId(preferred);
-      } catch (e: any) {
-        setErr(e?.message || "Could not access cameras.");
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
- const start = async () => {
-  try {
-    setErr("");
-    if (!readerRef.current) readerRef.current = new BrowserQRCodeReader();
-    if (!videoRef.current) throw new Error("Video not ready.");
-
-    setScanning(true);
-
-    // ✅ Prefer rear camera on mobile
-    const result = await readerRef.current.decodeOnceFromConstraints(
-      { video: { facingMode: { ideal: "environment" } } },
-      videoRef.current
-    );
+  const cancel = () => {
+    try {
+      // Some versions expose reset(), some don’t in TS.
+      // We can safely stop by clearing the video stream.
+      const v = videoRef.current;
+      const stream = v?.srcObject as MediaStream | null;
+      stream?.getTracks().forEach((t) => t.stop());
+      if (v) v.srcObject = null;
+    } catch {}
 
     setScanning(false);
-    router.push(toItemRoute(result.getText()));
-  } catch (e: any) {
-    setScanning(false);
-    setErr(e?.message || "Failed to start scanner.");
-  }
-};
+    setShowCamera(false);
+  };
 
   return (
     <main className="page">
@@ -86,62 +75,73 @@ export default function ScanPage() {
         <div className="frostCard" style={{ marginTop: 14 }}>
           <div style={{ color: "#f87171", fontWeight: 800 }}>{err}</div>
           <div style={{ marginTop: 8, opacity: 0.85 }}>
-            Camera access requires HTTPS on phones (or localhost).
+            Tip: camera access needs HTTPS on phones (or localhost).
           </div>
         </div>
       )}
 
-      <div className="frostCard" style={{ marginTop: 14 }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ fontWeight: 900 }}>Camera</div>
-
-          <select
-            value={deviceId}
-            onChange={(e) => setDeviceId(e.target.value)}
-            style={{
-              flex: "1 1 220px",
-              border: "1px solid #334155",
-              background: "rgba(255,255,255,0.04)",
-              color: "#fff",
-              borderRadius: 12,
-              padding: "10px 12px",
-              fontWeight: 800,
-            }}
-          >
-            {devices.map((d) => (
-              <option key={d.deviceId} value={d.deviceId}>
-                {d.label || "Camera"}
-              </option>
-            ))}
-          </select>
-
+      {!showCamera && (
+        <div className="buttonStack" style={{ marginTop: 14 }}>
           <button
-            onClick={start}
+            onClick={startScan}
             className="cardLink"
-            style={{ width: "auto", padding: "10px 14px", fontSize: 14 }}
+            style={{ textAlign: "center", cursor: "pointer" }}
             disabled={scanning}
           >
-            {scanning ? "Scanning…" : "▶ Scan"}
+            {scanning ? "Starting…" : "📷 Scan"}
           </button>
-        </div>
-      </div>
 
-      <div className="frostCard" style={{ marginTop: 14 }}>
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          style={{
-            width: "100%",
-            borderRadius: 14,
-            border: "1px solid #334155",
-            background: "rgba(255,255,255,0.02)",
-          }}
-        />
-        <div style={{ marginTop: 10, opacity: 0.85 }}>
-          Scan a label → jumps straight to the item page.
+          <div className="frostCard" style={{ opacity: 0.85 }}>
+            Tap scan, point at the label, and it will jump straight to the item page.
+          </div>
         </div>
-      </div>
+      )}
+
+      {showCamera && (
+        <div className="buttonStack" style={{ marginTop: 14 }}>
+          <div className="frostCard">
+            <video
+              ref={videoRef}
+              muted
+              playsInline
+              style={{
+                width: "100%",
+                borderRadius: 14,
+                border: "1px solid #334155",
+                background: "rgba(255,255,255,0.02)",
+              }}
+            />
+            <div style={{ marginTop: 10, opacity: 0.85 }}>
+              {scanning ? "Scanning…" : "Camera ready — tap Scan again if needed."}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 12 }}>
+            <button
+              onClick={startScan}
+              className="cardLink"
+              style={{ textAlign: "center", cursor: "pointer" }}
+              disabled={scanning}
+            >
+              {scanning ? "Scanning…" : "▶ Scan"}
+            </button>
+
+            <button
+              onClick={cancel}
+              className="cardLink"
+              style={{
+                textAlign: "center",
+                cursor: "pointer",
+                color: "#f87171",
+                borderColor: "#7f1d1d",
+              }}
+              disabled={scanning}
+            >
+              ✖ Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
