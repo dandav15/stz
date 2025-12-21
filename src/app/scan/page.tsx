@@ -56,29 +56,27 @@ export default function ScanPage() {
     };
   }, []);
 
-  const start = async () => {
-    try {
-      setErr("");
-      if (!readerRef.current) readerRef.current = new BrowserQRCodeReader();
-      if (!videoRef.current) throw new Error("Video not ready.");
-      if (!deviceId) throw new Error("No camera selected.");
+ const start = async () => {
+  try {
+    setErr("");
+    if (!readerRef.current) readerRef.current = new BrowserQRCodeReader();
+    if (!videoRef.current) throw new Error("Video not ready.");
 
-      setScanning(true);
+    setScanning(true);
 
-      // ✅ scans once, then stops automatically
-      const result = await readerRef.current.decodeOnceFromVideoDevice(
-        deviceId,
-        videoRef.current
-      );
+    // ✅ Prefer rear camera on mobile
+    const result = await readerRef.current.decodeOnceFromConstraints(
+      { video: { facingMode: { ideal: "environment" } } },
+      videoRef.current
+    );
 
-      setScanning(false);
-
-      router.push(toItemRoute(result.getText()));
-    } catch (e: any) {
-      setScanning(false);
-      setErr(e?.message || "Failed to start scanner.");
-    }
-  };
+    setScanning(false);
+    router.push(toItemRoute(result.getText()));
+  } catch (e: any) {
+    setScanning(false);
+    setErr(e?.message || "Failed to start scanner.");
+  }
+};
 
   return (
     <main className="page">
