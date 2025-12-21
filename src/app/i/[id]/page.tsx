@@ -46,27 +46,33 @@ export default function ItemPage() {
     setTimeout(() => setPulse(false), 220);
   }
 
-  async function move(delta: number, btnKey: string) {
-    setActiveBtn(btnKey);
+ async function move(delta: number, btnKey: string) {
+  setActiveBtn(btnKey);
 
-    const { error } = await supabase.rpc("apply_movement", {
-      p_item_id: id,
-      p_delta: delta,
-      p_reason: delta > 0 ? "receive" : "issue",
-      p_note: null,
-    });
+  // ✅ optimistic UI (instant feedback)
+  setItem((prev: any) => (prev ? { ...prev, stock_on_hand: prev.stock_on_hand + delta } : prev));
 
-    setTimeout(() => setActiveBtn(null), 160);
+  const { error } = await supabase.rpc("apply_movement", {
+    p_item_id: id,
+    p_delta: delta,
+    p_reason: delta > 0 ? "receive" : "issue",
+    p_note: null,
+  });
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+  setTimeout(() => setActiveBtn(null), 160);
 
-    hapticSuccess();
-    triggerPulse();
+  if (error) {
+    // rollback if it failed
     await load();
+    alert(error.message);
+    return;
   }
+
+  hapticSuccess();
+  triggerPulse();
+  await load();
+}
+ 
 
   useEffect(() => {
     if (id) load();
