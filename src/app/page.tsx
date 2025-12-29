@@ -26,6 +26,12 @@ export default function HomePage() {
             ➕ Add item (admin)
           </Link>
          )}
+         {!adminLoading && isAdmin && (
+  <Link href="/audit" className="cardLink">
+    🧾 Audit (admin)
+  </Link>
+        )}
+
 
           <Link
             href="/logout"
