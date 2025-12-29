@@ -212,7 +212,7 @@ Thanks,
           <div className="frostCard" style={{ marginTop: 14 }}>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
               <button
-                className="cardLink"
+                className="appButton"
                 style={{ width: "auto", padding: "10px 14px", fontSize: 14 }}
                 onClick={createPendingOrder}
               >
@@ -221,7 +221,7 @@ Thanks,
 
               <Link
                 href="/orders/pending"
-                className="cardLink"
+                className="appButton"
                 style={{ width: "auto", padding: "10px 14px", fontSize: 14 }}
               >
                 📦 Pending orders →
@@ -236,7 +236,7 @@ Thanks,
               <div style={{ marginTop: 12 }}>
                 <div style={{ fontWeight: 900 }}>Pending order created: #{createdOrderId.slice(0, 8)}</div>
                 <div className="buttonStack" style={{ marginTop: 10 }}>
-                  <button className="cardLink" onClick={copyEmail} style={{ textAlign: "center" }}>
+                  <button className="appButton" onClick={copyEmail} style={{ textAlign: "center" }}>
                     📋 Copy email draft
                   </button>
                 </div>

@@ -100,9 +100,6 @@ export default function ScanPage() {
       {err && (
         <div className="frostCard" style={{ marginTop: 14 }}>
           <div style={{ color: "#f87171", fontWeight: 800 }}>{err}</div>
-          <div style={{ marginTop: 8, opacity: 0.85 }}>
-            Tip: camera access needs HTTPS on phones (or localhost).
-          </div>
         </div>
       )}
 
@@ -110,7 +107,7 @@ export default function ScanPage() {
         <div className="buttonStack" style={{ marginTop: 18 }}>
           <button
             onClick={startScan}
-            className="cardLink"
+            className="appButton"
             style={{
               textAlign: "center",
               cursor: "pointer",
@@ -152,7 +149,7 @@ export default function ScanPage() {
           <div style={{ display: "flex", gap: 12 }}>
             <button
               onClick={startScan}
-              className="cardLink"
+              className="appButton"
               style={{
                 textAlign: "center",
                 cursor: "pointer",
@@ -168,7 +165,7 @@ export default function ScanPage() {
 
             <button
               onClick={cancel}
-              className="cardLink"
+              className="appButton"
               style={{
                 textAlign: "center",
                 cursor: "pointer",

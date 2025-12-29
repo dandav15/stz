@@ -127,7 +127,7 @@ export default function OrderDetailPage() {
         <div className="frostCard" style={{ marginTop: 14 }}>
           <div style={{ color: "#f87171", fontWeight: 800 }}>{err}</div>
           <button
-            className="cardLink"
+            className="appButton"
             style={{ marginTop: 12, textAlign: "center" }}
             onClick={() => router.push("/orders/pending")}
           >
@@ -152,7 +152,7 @@ export default function OrderDetailPage() {
 
         {isPending && (
           <div className="buttonStack" style={{ marginTop: 12 }}>
-            <button className="cardLink" style={{ textAlign: "center" }} onClick={receiveAll}>
+            <button className="appButton" style={{ textAlign: "center" }} onClick={receiveAll}>
               ✅ Receive all remaining
             </button>
           </div>
@@ -200,19 +200,11 @@ export default function OrderDetailPage() {
                     onChange={(e) =>
                       setReceiveNow((prev) => ({ ...prev, [l.item_id]: Number(e.target.value) }))
                     }
-                    style={{
-                      width: 90,
-                      border: "1px solid #334155",
-                      background: "rgba(255,255,255,0.04)",
-                      color: "#fff",
-                      borderRadius: 12,
-                      padding: "8px 10px",
-                      fontWeight: 900,
-                    }}
+                    className="appButton"
                   />
 
                   <button
-                    className="cardLink"
+                    className="appButton"
                     style={{ width: "auto", padding: "10px 14px", fontSize: 14, textAlign: "center" }}
                     disabled={busyItemId === l.item_id}
                     onClick={() => receiveLine(l.item_id)}
@@ -227,7 +219,7 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="buttonStack" style={{ marginTop: 14 }}>
-        <button className="cardLink" style={{ textAlign: "center" }} onClick={() => router.push("/orders/pending")}>
+        <button className="appButton" style={{ textAlign: "center" }} onClick={() => router.push("/orders/pending")}>
           Back to pending orders
         </button>
       </div>

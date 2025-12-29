@@ -230,6 +230,12 @@ export default function ItemPage() {
       <div className="pageContent">
 
         {/* Stock display */}
+        <h1 className="frostCard"
+        style={{
+          textAlign: "center",
+          marginTop: 6,
+        }}
+        >{item.name}</h1>
         <div
           className="frostCard"
           style={{
@@ -240,7 +246,6 @@ export default function ItemPage() {
             marginTop: 14,
           }}
         >
-          <div style={{ fontSize: 15, opacity: 0.75 }}>In stock</div>
 
 {/* Admin: folder assignment (prettier) */}
 {!adminLoading && isAdmin && (
@@ -259,10 +264,6 @@ export default function ItemPage() {
       <div style={{ opacity: 0.75, fontWeight: 800 }}>
         {folderBusy ? "Saving…" : `${itemFolderIds.size} selected`}
       </div>
-    </div>
-
-    <div style={{ marginTop: 10, opacity: 0.75, fontSize: 13 }}>
-      Tap to add/remove this item from folders.
     </div>
 
     {folders.length === 0 ? (

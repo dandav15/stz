@@ -86,13 +86,13 @@ export default function PendingOrdersPage() {
       <h1 className="frostCard">Pending orders</h1>
 
       <div className="buttonStack" style={{ marginTop: 14 }}>
-        <Link href="/low-stock" className="cardLink" style={{ textAlign: "center" }}>
+        <Link href="/low-stock" className="appButton" style={{ textAlign: "center" }}>
           ← Back to Low Stock
         </Link>
 
         <button
           onClick={load}
-          className="cardLink"
+          className="appButton"
           style={{ textAlign: "center" }}
         >
           🔄 Refresh
@@ -170,7 +170,7 @@ export default function PendingOrdersPage() {
                 <div className="buttonStack" style={{ marginTop: 12 }}>
                   <button
                     onClick={() => copyDraft(o)}
-                    className="cardLink"
+                    className="appButton"
                     style={{ textAlign: "center" }}
                   >
                     {copiedId === o.id ? "✅ Copied!" : "📋 Copy email draft"}
@@ -178,7 +178,7 @@ export default function PendingOrdersPage() {
 
                   <Link
                     href={`/orders/${encodeURIComponent(o.id)}`}
-                    className="cardLink"
+                    className="appButton"
                     style={{ textAlign: "center" }}
                   >
                     Open order / Receive →
