@@ -106,31 +106,38 @@ export default function AdminFoldersPage() {
       )}
 
       <div className="frostCard" style={{ marginTop: 14 }}>
-        <div style={{ fontWeight: 900, marginBottom: 10 }}>Add a folder</div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. EV"
-            style={{
-              flex: "1 1 220px",
-              border: "1px solid #334155",
-              background: "rgba(255,255,255,0.04)",
-              color: "#fff",
-              borderRadius: 12,
-              padding: "10px 12px",
-              fontWeight: 800,
-            }}
-          />
-          <button
-            className="cardLink"
-            style={{ width: "auto", padding: "10px 14px" }}
-            onClick={addFolder}
-          >
-            ➕ Add
-          </button>
-        </div>
-      </div>
+  <div style={{ fontWeight: 900, fontSize: 16 }}>Add folder</div>
+  <div style={{ marginTop: 6, opacity: 0.75, fontSize: 13 }}>
+    Create categories!
+  </div>
+
+  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
+    <input
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      placeholder="e.g. EV, Accessories, etc."
+      style={{
+        flex: "1 1 220px",
+        border: "1px solid #334155",
+        background: "rgba(255,255,255,0.04)",
+        color: "#fff",
+        borderRadius: 14,
+        padding: "12px 12px",
+        fontWeight: 800,
+        outline: "none",
+      }}
+    />
+    <button
+      className="cardLink"
+      style={{ width: "auto", padding: "12px 14px" }}
+      onClick={addFolder}
+      disabled={!name.trim()}
+    >
+      ➕ Add
+    </button>
+  </div>
+</div>
+
 
       {loading ? (
         <div className="frostCard" style={{ marginTop: 14 }}>
@@ -138,44 +145,80 @@ export default function AdminFoldersPage() {
         </div>
       ) : (
         <div className="buttonStack" style={{ marginTop: 14 }}>
-          {folders.map((f) => (
-            <div key={f.id} className="frostCard">
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-                <input
-                  defaultValue={f.name}
-                  onBlur={(e) => renameFolder(f.id, e.target.value)}
-                  style={{
-                    flex: "1 1 220px",
-                    border: "1px solid #334155",
-                    background: "rgba(255,255,255,0.04)",
-                    color: "#fff",
-                    borderRadius: 12,
-                    padding: "10px 12px",
-                    fontWeight: 800,
-                  }}
-                />
-                <button
-                  className="cardLink"
-                  style={{
-                    width: "auto",
-                    padding: "10px 14px",
-                    color: "#f87171",
-                    borderColor: "#7f1d1d",
-                  }}
-                  onClick={() => deleteFolder(f.id)}
-                >
-                  🗑️ Delete
-                </button>
-              </div>
-              <div style={{ marginTop: 8, opacity: 0.75 }}>
-                Rename by editing then clicking away.
-              </div>
-            </div>
-          ))}
-          {folders.length === 0 && (
-            <div className="frostCard">No folders yet — add your first one above.</div>
-          )}
+  {folders.map((f) => (
+    <div key={f.id} className="cardLink" style={{ cursor: "default" }}>
+      {/* Top row */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <div style={{ fontWeight: 900 }}>
+          {f.name}
         </div>
+
+        <Link
+          href={`/admin/folders/${encodeURIComponent(f.id)}`}
+          className="cardLink"
+          style={{
+            width: "auto",
+            padding: "10px 14px",
+            borderRadius: 999,
+          }}
+        >
+          📦 Edit items →
+        </Link>
+      </div>
+
+      {/* Rename */}
+      <div style={{ marginTop: 10 }}>
+        <div style={{ opacity: 0.75, fontWeight: 800, fontSize: 13 }}>
+          Rename
+        </div>
+        <input
+          defaultValue={f.name}
+          onBlur={(e) => renameFolder(f.id, e.target.value)}
+          style={{
+            marginTop: 8,
+            width: "100%",
+            border: "1px solid #334155",
+            background: "rgba(255,255,255,0.04)",
+            color: "#fff",
+            borderRadius: 14,
+            padding: "12px 12px",
+            fontWeight: 800,
+            outline: "none",
+          }}
+        />
+      </div>
+
+      {/* Delete */}
+      <div style={{ marginTop: 12 }}>
+        <button
+          className="cardLink"
+          style={{
+            width: "100%",
+            textAlign: "center",
+            color: "#f87171",
+            borderColor: "#7f1d1d",
+          }}
+          onClick={() => deleteFolder(f.id)}
+        >
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+  ))}
+
+  {folders.length === 0 && (
+    <div className="frostCard">No folders yet — add your first one above.</div>
+  )}
+</div>
+
+
       )}
     </main>
   );

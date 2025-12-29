@@ -242,42 +242,88 @@ export default function ItemPage() {
         >
           <div style={{ fontSize: 15, opacity: 0.75 }}>In stock</div>
 
-          {/* Admin: folder assignment */}
+{/* Admin: folder assignment (prettier) */}
 {!adminLoading && isAdmin && (
   <div className="frostCard" style={{ marginTop: 14 }}>
-    <div style={{ fontWeight: 900, marginBottom: 10 }}>Folders</div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 12,
+        flexWrap: "wrap",
+      }}
+    >
+      <div style={{ fontWeight: 900, fontSize: 16 }}>Folders</div>
+
+      <div style={{ opacity: 0.75, fontWeight: 800 }}>
+        {folderBusy ? "Saving…" : `${itemFolderIds.size} selected`}
+      </div>
+    </div>
+
+    <div style={{ marginTop: 10, opacity: 0.75, fontSize: 13 }}>
+      Tap to add/remove this item from folders.
+    </div>
 
     {folders.length === 0 ? (
-      <div style={{ opacity: 0.85 }}>No folders yet. Create some in Admin → Folders.</div>
+      <div style={{ marginTop: 12, opacity: 0.85 }}>
+        No folders yet. Create some in <b>Admin → Folders</b>.
+      </div>
     ) : (
-      <div style={{ display: "grid", gap: 10 }}>
+      <div
+        style={{
+          marginTop: 12,
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 10,
+        }}
+      >
         {folders.map((f) => {
-          const checked = itemFolderIds.has(f.id);
+          const active = itemFolderIds.has(f.id);
+
           return (
-            <label
+            <button
               key={f.id}
+              type="button"
+              disabled={folderBusy}
+              onClick={() => toggleFolder(f.id, !active)}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
+                border: "1px solid #334155",
+                background: active
+                  ? "rgba(255,255,255,0.12)"
+                  : "rgba(255,255,255,0.04)",
+                color: "#fff",
+                borderRadius: 999,
+                padding: "10px 12px",
+                fontWeight: 900,
+                cursor: folderBusy ? "not-allowed" : "pointer",
                 opacity: folderBusy ? 0.7 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                boxShadow: active ? "0 0 0 3px rgba(255,255,255,0.12)" : "none",
+                transition: "box-shadow 140ms ease, transform 140ms ease",
+                transform: active ? "scale(0.99)" : "scale(1)",
               }}
             >
-              <input
-                type="checkbox"
-                checked={checked}
-                disabled={folderBusy}
-                onChange={(e) => toggleFolder(f.id, e.target.checked)}
-                style={{ transform: "scale(1.15)" }}
+              <span
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 999,
+                  background: active ? "#22c55e" : "rgba(255,255,255,0.25)",
+                  boxShadow: active ? "0 0 10px rgba(34,197,94,0.6)" : "none",
+                }}
               />
-              <span style={{ fontWeight: 900 }}>{f.name}</span>
-            </label>
+              {f.name}
+            </button>
           );
         })}
       </div>
     )}
   </div>
 )}
+
 
 
           <div
