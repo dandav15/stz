@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
+import { useAdmin } from "@/components/AdminProvider";
 
 export default function ItemPage() {
   const params = useParams();
@@ -14,6 +15,11 @@ export default function ItemPage() {
   const [item, setItem] = useState<any>(null);
   const [pulse, setPulse] = useState(false);
   const [activeBtn, setActiveBtn] = useState<string | null>(null);
+  const { isAdmin, loading: adminLoading } = useAdmin();
+  const [folders, setFolders] = useState<any[]>([]);
+  const [itemFolderIds, setItemFolderIds] = useState<Set<string>>(new Set());
+  const [folderBusy, setFolderBusy] = useState(false);
+
 
   async function load() {
     const { data, error } = await supabase
@@ -34,6 +40,66 @@ export default function ItemPage() {
 
     setItem(data);
   }
+
+  async function toggleFolder(folderId: string, checked: boolean) {
+  setFolderBusy(true);
+
+  if (checked) {
+    const { error } = await supabase
+      .from("item_folders")
+      .insert({ item_id: id, folder_id: folderId });
+
+    if (error) {
+      alert(error.message);
+      setFolderBusy(false);
+      return;
+    }
+
+    setItemFolderIds((prev) => new Set(prev).add(folderId));
+  } else {
+    const { error } = await supabase
+      .from("item_folders")
+      .delete()
+      .eq("item_id", id)
+      .eq("folder_id", folderId);
+
+    if (error) {
+      alert(error.message);
+      setFolderBusy(false);
+      return;
+    }
+
+    setItemFolderIds((prev) => {
+      const next = new Set(prev);
+      next.delete(folderId);
+      return next;
+    });
+  }
+
+  setFolderBusy(false);
+}
+
+
+  async function loadFoldersAndLinks() {
+  const { data: fData, error: fErr } = await supabase
+    .from("folders")
+    .select("id,name")
+    .order("name");
+
+  if (fErr) return;
+
+  setFolders(fData || []);
+
+  const { data: links, error: lErr } = await supabase
+    .from("item_folders")
+    .select("folder_id")
+    .eq("item_id", id);
+
+  if (lErr) return;
+
+  setItemFolderIds(new Set((links || []).map((x: any) => x.folder_id)));
+}
+
 
   function hapticSuccess() {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -75,9 +141,12 @@ export default function ItemPage() {
  
 
   useEffect(() => {
-    if (id) load();
+    if (id) {
+      load();
+      if (!adminLoading && isAdmin) loadFoldersAndLinks();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, adminLoading, isAdmin]);
 
   // ✅ Loading
   if (!item) {
@@ -172,6 +241,44 @@ export default function ItemPage() {
           }}
         >
           <div style={{ fontSize: 15, opacity: 0.75 }}>In stock</div>
+
+          {/* Admin: folder assignment */}
+{!adminLoading && isAdmin && (
+  <div className="frostCard" style={{ marginTop: 14 }}>
+    <div style={{ fontWeight: 900, marginBottom: 10 }}>Folders</div>
+
+    {folders.length === 0 ? (
+      <div style={{ opacity: 0.85 }}>No folders yet. Create some in Admin → Folders.</div>
+    ) : (
+      <div style={{ display: "grid", gap: 10 }}>
+        {folders.map((f) => {
+          const checked = itemFolderIds.has(f.id);
+          return (
+            <label
+              key={f.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                opacity: folderBusy ? 0.7 : 1,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={checked}
+                disabled={folderBusy}
+                onChange={(e) => toggleFolder(f.id, e.target.checked)}
+                style={{ transform: "scale(1.15)" }}
+              />
+              <span style={{ fontWeight: 900 }}>{f.name}</span>
+            </label>
+          );
+        })}
+      </div>
+    )}
+  </div>
+)}
+
 
           <div
             style={{
