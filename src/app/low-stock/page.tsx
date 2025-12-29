@@ -71,7 +71,7 @@ export default function LowStockPage() {
       // Load pending items (already on pending orders) to prevent duplicates
       const { data: pendingLines, error: pendErr } = await supabase
         .from("order_lines")
-        .select("item_name, orders!inner(status)")
+        .select("item_id, orders!inner(status)")
         .eq("orders.status", "pending");
 
       if (pendErr) {
@@ -121,9 +121,10 @@ export default function LowStockPage() {
     setErr("");
 
     const { data, error } = await supabase
-      .from("order_lines")
-      .select("item_name, qty_ordered, item:items(name)")
-      .eq("order_id", orderId);
+  .from("order_lines")
+  .select("item_id, qty_ordered, items(name)")
+  .eq("order_id", orderId);
+
 
     if (error) {
       setErr(error.message);
@@ -152,16 +153,12 @@ export default function LowStockPage() {
   ).slice(0, 10);
 
     const lines =
-      emailLines.length > 0
-        ? emailLines
-            .map(
-              (l) =>
-                `- ${l.name || `Item ${l.item_id.slice(0, 8)}`} — Qty: ${
-                  l.qty_ordered
-                }`
-            )
-            .join("\n")
-        : "(No lines found for this order)";
+  emailLines.length > 0
+    ? emailLines
+        .map((l: any) => `- ${l.items?.name ?? l.item_id} — Qty: ${l.qty_ordered}`)
+        .join("\n")
+    : "(No lines found for this order)";
+
 
     return `Subject: Downlight Electrical Stock Order – ${today} – #${orderRef}
 
@@ -256,6 +253,7 @@ Thanks,
   };
 
   return (
+    
     <main className="page">
       <h1 className="frostCard">Low stock</h1>
 
@@ -355,7 +353,7 @@ Thanks,
               return (
                 <div
                   key={i.id}
-                  className="cardLink"
+                  className="appButton"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",

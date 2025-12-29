@@ -8,8 +8,9 @@ type OrderLine = {
   item_id: string;
   qty_ordered: number;
   qty_received: number;
-  items?: { name: string }[] | null; // supabase join comes back as array
+  item?: { name: string } | null; // <- object (not array)
 };
+
 
 type Order = {
   id: string;
@@ -20,11 +21,17 @@ type Order = {
 };
 
 function buildEmailDraft(order: Order) {
-  const orderRef = String(order.id).slice(0, 8);
-  const today = new Date().toISOString().slice(0, 10);
+  const orderRef =
+    (order as any).order_number ?? String(order.id).slice(0, 8);
+
+  const today = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
 
   const lines = (order.order_lines || [])
-    .map((l) => `- ${l.items?.[0]?.name || l.item_id} — Qty: ${l.qty_ordered}`)
+    .map((l) => `- ${l.item?.name || l.item_id} — Qty: ${l.qty_ordered}`)
     .join("\n");
 
   return `Subject: STZ Stock Order – ${today} – #${orderRef}
@@ -38,6 +45,7 @@ ${lines || "(no lines)"}
 Thanks,
 `;
 }
+
 
 export default function PendingOrdersPage() {
   const supabase = supabaseBrowser();
@@ -53,12 +61,14 @@ export default function PendingOrdersPage() {
 
     // ✅ load orders + lines + item names
     const { data, error } = await supabase
-      .from("orders")
-      .select(
-        "id,status,created_at,note,order_lines(item_id,qty_ordered,qty_received,items(name))"
-      )
-      .eq("status", "pending")
-      .order("created_at", { ascending: false });
+  .from("orders")
+  .select(
+    "id,order_number,status,created_at,note,order_lines(item_id,qty_ordered,qty_received,item:items(name))"
+  )
+  .eq("status", "pending")
+  .order("created_at", { ascending: false });
+
+
 
     if (error) setErr(error.message);
     setOrders((data as any) || []);
@@ -156,7 +166,7 @@ export default function PendingOrdersPage() {
                   <div style={{ marginTop: 10, opacity: 0.9, fontSize: 13 }}>
                     {(o.order_lines || []).slice(0, 4).map((l) => (
                       <div key={l.item_id}>
-                        • {l.items?.[0]?.name || l.item_id} — {l.qty_ordered}
+                        • {l.item?.name || l.item_id} — {l.qty_ordered}
                       </div>
                     ))}
                     {lineCount > 4 && (
