@@ -1,6 +1,10 @@
+"use client";
+
+import { AdminProvider, useAdmin } from "@/components/AdminProvider";
 import Link from "next/link";
 
 export default function HomePage() {
+  const { isAdmin, loading: adminLoading } = useAdmin();
   return (
     <main className = "page">
 
@@ -17,9 +21,11 @@ export default function HomePage() {
             ⚠️ Low stock
           </Link>
 
+         { !adminLoading && isAdmin && (
           <Link href="/admin/items/new" className="cardLink">
             ➕ Add item (admin)
           </Link>
+         )}
 
           <Link
             href="/logout"

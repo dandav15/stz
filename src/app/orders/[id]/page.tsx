@@ -70,6 +70,11 @@ export default function OrderDetailPage() {
 
   const receiveLine = async (itemId: string) => {
     try {
+      if (!isAdmin) {
+  setErr("Admin only.");
+  return;
+}
+
       setErr("");
       const qty = Number(receiveNow[itemId] || 0);
       if (qty <= 0) {
@@ -100,6 +105,10 @@ export default function OrderDetailPage() {
   };
 
   const receiveAll = async () => {
+   if (!isAdmin) {
+  setErr("Admin only.");
+  return;
+}
     setErr("");
     // do sequential to keep it simple + readable
     for (const l of lines) {
@@ -142,10 +151,20 @@ export default function OrderDetailPage() {
   }
 
   const isPending = order.status === "pending";
+  const showAdminGate = !adminLoading && !isAdmin && isPending;
 
   return (
     <main className="page">
       <div className="frostCard">
+        {showAdminGate && (
+  <div className="frostCard" style={{ marginTop: 14 }}>
+    <div style={{ fontWeight: 900 }}>Admin only</div>
+    <div style={{ opacity: 0.85, marginTop: 6 }}>
+      Only admins can receive orders.
+    </div>
+  </div>
+)}
+
         <div style={{ fontWeight: 900, fontSize: 18 }}>
           Order #{String(order.id).slice(0, 8)}
         </div>
@@ -193,31 +212,32 @@ export default function OrderDetailPage() {
                 </div>
               </div>
 
-              {isPending && !done && (
-                <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                  <div style={{ opacity: 0.85, fontWeight: 800 }}>Receive now</div>
+              {isPending && !done && isAdmin && (
+  <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+    <div style={{ opacity: 0.85, fontWeight: 800 }}>Receive now</div>
 
-                  <input
-                    type="number"
-                    min={1}
-                    max={remaining}
-                    value={receiveNow[l.item_id] ?? remaining}
-                    onChange={(e) =>
-                      setReceiveNow((prev) => ({ ...prev, [l.item_id]: Number(e.target.value) }))
-                    }
-                    className="appButton"
-                  />
+    <input
+      type="number"
+      min={1}
+      max={remaining}
+      value={receiveNow[l.item_id] ?? remaining}
+      onChange={(e) =>
+        setReceiveNow((prev) => ({ ...prev, [l.item_id]: Number(e.target.value) }))
+      }
+      className="appButton"
+    />
 
-                  <button
-                    className="appButton"
-                    style={{ width: "auto", padding: "10px 14px", fontSize: 14, textAlign: "center" }}
-                    disabled={busyItemId === l.item_id}
-                    onClick={() => receiveLine(l.item_id)}
-                  >
-                    {busyItemId === l.item_id ? "Receiving…" : "Receive"}
-                  </button>
-                </div>
-              )}
+    <button
+      className="appButton"
+      style={{ width: "auto", padding: "10px 14px", fontSize: 14, textAlign: "center" }}
+      disabled={busyItemId === l.item_id}
+      onClick={() => receiveLine(l.item_id)}
+    >
+      {busyItemId === l.item_id ? "Receiving…" : "Receive"}
+    </button>
+  </div>
+)}
+
             </div>
           );
         })}

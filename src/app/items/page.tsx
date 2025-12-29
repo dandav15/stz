@@ -112,19 +112,6 @@ export default function ItemsPage() {
   );
 }
 
-if (!isAdmin) {
-  return (
-    <main className="page">
-      <div className="frostCard" style={{ marginTop: 14 }}>
-        <div style={{ fontWeight: 900 }}>Admin only</div>
-        <div style={{ opacity: 0.85, marginTop: 6 }}>
-          You don’t have permission to add items.
-        </div>
-      </div>
-    </main>
-  );
-}
-
   return (
     <main className="page">
       <div className="pageContent">
