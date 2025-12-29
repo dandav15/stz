@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
-
+import { useAdmin } from "@/components/AdminProvider";
 type OrderLine = {
   item_id: string;
   qty_ordered: number;
@@ -49,7 +49,7 @@ Thanks,
 
 export default function PendingOrdersPage() {
   const supabase = supabaseBrowser();
-
+  const {isAdmin, loading: adminLoading} = useAdmin();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -185,7 +185,7 @@ export default function PendingOrdersPage() {
                   >
                     {copiedId === o.id ? "✅ Copied!" : "📋 Copy email draft"}
                   </button>
-
+                {isAdmin ? (  
                   <Link
                     href={`/orders/${encodeURIComponent(o.id)}`}
                     className="appButton"
@@ -193,6 +193,11 @@ export default function PendingOrdersPage() {
                   >
                     Open order / Receive →
                   </Link>
+                ) : (
+                  <div className="frostCard" style={{ marginTop: 12, opacity: 0.85 }}>
+                    Receiving orders is admin-only.
+                  </div>
+                )}
                 </div>
               </div>
             );

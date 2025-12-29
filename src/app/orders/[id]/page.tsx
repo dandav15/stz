@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
+import { useAdmin } from "@/components/AdminProvider";
 
 type Line = {
   item_id: string;
@@ -17,7 +18,7 @@ export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const orderId = params?.id as string;
-
+  const {isAdmin, loading: adminLoading } = useAdmin();
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [order, setOrder] = useState<any>(null);
@@ -126,6 +127,7 @@ export default function OrderDetailPage() {
       <main className="page">
         <div className="frostCard" style={{ marginTop: 14 }}>
           <div style={{ color: "#f87171", fontWeight: 800 }}>{err}</div>
+          {isAdmin && (
           <button
             className="appButton"
             style={{ marginTop: 12, textAlign: "center" }}
@@ -133,6 +135,7 @@ export default function OrderDetailPage() {
           >
             Back to pending orders
           </button>
+          )}
         </div>
       </main>
     );
@@ -152,9 +155,11 @@ export default function OrderDetailPage() {
 
         {isPending && (
           <div className="buttonStack" style={{ marginTop: 12 }}>
+           {isAdmin && (
             <button className="appButton" style={{ textAlign: "center" }} onClick={receiveAll}>
               ✅ Receive all remaining
             </button>
+           )}
           </div>
         )}
       </div>
@@ -219,9 +224,11 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="buttonStack" style={{ marginTop: 14 }}>
+        {isAdmin && (
         <button className="appButton" style={{ textAlign: "center" }} onClick={() => router.push("/orders/pending")}>
           Back to pending orders
         </button>
+        )}
       </div>
     </main>
   );

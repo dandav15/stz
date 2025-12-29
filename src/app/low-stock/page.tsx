@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
+import { useAdmin } from "@/components/AdminProvider";
 
 type Item = {
   id: string;
@@ -24,7 +25,7 @@ type EmailLine = {
 
 export default function LowStockPage() {
   const supabase = supabaseBrowser();
-
+  const {isAdmin, loading: adminLoading } = useAdmin();
   const [items, setItems] = useState<Item[]>([]);
   const [pendingItemIds, setPendingItemIds] = useState<Set<string>>(new Set());
 
@@ -287,6 +288,7 @@ Thanks,
                 alignItems: "center",
               }}
             >
+             {isAdmin && (
               <button
                 className="appButton"
                 style={{ width: "auto", padding: "10px 14px", fontSize: 14 }}
@@ -295,6 +297,16 @@ Thanks,
               >
                 {creating ? "Creating…" : "🧾 Create pending order"}
               </button>
+             )}
+             {!adminLoading && !isAdmin && (
+  <div className="frostCard" style={{ marginTop: 14 }}>
+    <div style={{ fontWeight: 900 }}>Admin only</div>
+    <div style={{ opacity: 0.85, marginTop: 6 }}>
+      Creating orders is restricted to admins.
+    </div>
+  </div>
+)}
+
 
               <Link
                 href="/orders/pending"
